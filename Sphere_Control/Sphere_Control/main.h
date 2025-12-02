@@ -15,14 +15,15 @@
 #include <avr/interrupt.h>
 #include <math.h>
 #include <stdlib.h>
-#include "lcd_gcc.h"
+#include "lcd.h"
 #include "servo.h"
+#include "gy25.h"
 
 ISR(TIMER1_COMPA_vect)
 {
 	asm("nop");
 }
-static inline void delay_ms(uint16_t ms);
+inline void delay_ms(uint16_t ms);
 
 
 

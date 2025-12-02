@@ -1,4 +1,4 @@
-main.d main.o: .././main.c .././main.h \
+uart.d uart.o: .././uart.c .././uart.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\inttypes.h \
@@ -10,15 +10,9 @@ main.d main.o: .././main.c .././main.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\version.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\fuse.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
- d:\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
- .././lcd.h .././servo.h .././gy25.h .././uart.h
+ d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h
 
-.././main.h:
+.././uart.h:
 
 d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -42,22 +36,4 @@ d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\fuse.h:
 
 d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h:
 
-d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h:
-
-d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h:
-
-d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h:
-
 d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
-
-d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
-
-d:\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
-
-.././lcd.h:
-
-.././servo.h:
-
-.././gy25.h:
-
-.././uart.h:

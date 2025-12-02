@@ -25,7 +25,7 @@ static inline void delay_ms(uint16_t ms);
 void Servo_Init(void);
 void Timer1_16bit_FastPWM_Init(void);
 static inline uint16_t DEG2OCR(uint16_t deg);
-void sample_code(void);
+void Servo_sample_code(void);
 
 // 0 deg  OCR1 = 922
 // 45 deg OCR1 = 1843
@@ -72,7 +72,7 @@ static inline uint16_t DEG2OCR(uint16_t deg)
 	return ocr;
 }
 
-void sample_code(void)
+void Servo_sample_code(void)
 {
 	//OCR1A = DEG2OCR(180);
 	OCR1A = DEG2OCR(90);
@@ -80,8 +80,11 @@ void sample_code(void)
 	uint16_t cur_deg = 90;
 	uint16_t cur_deg2 = 90;
 	uint8_t lcd_deg_buffer[4];
-	uint8_t SET_DISP[] = "degree :";
+	uint8_t lcd_deg_buffer2[4];
+	uint8_t SET_DISP[] = "degree1 :";
+	uint8_t SET_DISP2[] = "degree2 :";
 	itoa(cur_deg, lcd_deg_buffer, 10);
+	itoa(cur_deg2, lcd_deg_buffer2, 10);
 	
 	while(1)
 	{
@@ -101,6 +104,7 @@ void sample_code(void)
 				cur_deg = 0;
 				cur_deg2 = 180;
 				itoa(cur_deg, lcd_deg_buffer, 10);
+				itoa(cur_deg2, lcd_deg_buffer2, 10);
 				break;
 			case 0xfd:
 				delay_ms(100);
@@ -127,31 +131,33 @@ void sample_code(void)
 				itoa(cur_deg, lcd_deg_buffer, 10);
 				break;
 			case 0xdf:
-				delay_ms(100);
-				OCR1A = DEG2OCR(150);
-				cur_deg = 150;
-				itoa(cur_deg, lcd_deg_buffer, 10);
+				
 				break;
 			case 0xbf:
 				delay_ms(100);
 				cur_deg2+=10;
 				OCR1B = DEG2OCR(cur_deg2);
-				itoa(cur_deg, lcd_deg_buffer, 10);
+				itoa(cur_deg2, lcd_deg_buffer2, 10);
 				break;
 			case 0x7f:
 				delay_ms(100);
 				cur_deg2-=10;
 				OCR1B = DEG2OCR(cur_deg2);
-				itoa(cur_deg, lcd_deg_buffer, 10);
+				itoa(cur_deg2, lcd_deg_buffer2, 10);
 				break;
 			default:
 			
 			break;
 		}
+		LCD_Clear();
 		LCD_Pos(0,0);
 		LCD_Str(SET_DISP);
 		LCD_Pos(0,10);
 		LCD_Str(lcd_deg_buffer);
+		LCD_Pos(1,0);
+		LCD_Str(SET_DISP2);
+		LCD_Pos(1,10);
+		LCD_Str(lcd_deg_buffer2);
 		delay_ms(100);	
 	}
 }
@@ -159,3 +165,4 @@ void sample_code(void)
 
 
 #endif /* SERVO_H_ */
+

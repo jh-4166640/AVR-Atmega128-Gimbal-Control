@@ -1,4 +1,4 @@
-main.d main.o: .././main.c .././main.h \
+gy25.d gy25.o: .././gy25.c .././gy25.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\inttypes.h \
@@ -16,9 +16,9 @@ main.d main.o: .././main.c .././main.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
  d:\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
- .././lcd.h .././servo.h .././gy25.h .././uart.h
+ .././uart.h .././lcd.h
 
-.././main.h:
+.././gy25.h:
 
 d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -54,10 +54,6 @@ d:\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
 
 d:\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
 
-.././lcd.h:
-
-.././servo.h:
-
-.././gy25.h:
-
 .././uart.h:
+
+.././lcd.h:
