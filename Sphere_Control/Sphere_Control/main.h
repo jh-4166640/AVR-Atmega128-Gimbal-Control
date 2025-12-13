@@ -19,6 +19,8 @@
 #include "servo.h"
 #include "MPU6050.h"
 
+#define Q2deg	5
+
 
 servo_t servo_status; //Current Servo motor angle status
 int16_t LPF_alpha = 80, LPF_scale = 100; // LPF의 alpha: LPF_alpha / LPF_scale = 0.8

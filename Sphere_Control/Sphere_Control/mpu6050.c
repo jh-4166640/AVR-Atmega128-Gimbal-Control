@@ -34,21 +34,21 @@ void Timer3_16bit_CTC_Init(void)
 }
 
 
-
 uint8_t MPU6050_Check_WHO_AM_I(void)
 {
     uint8_t device_id = 0;
     uint8_t ret;
+	uint8_t str[16];
     ret = TWI_Master_Receive_ExDevice(MPU6050_ADDR_W, MPU6050_WHO_AM_I, &device_id);
 
     // TWI 통신 자체에 오류가 있었는지 확인 (ret != 0)
     if (ret != 0) {
         return ret; // TWI 에러 코드를 반환
     }
-	LCD_Clear();
-	LCD_Pos(0,0);
-	LCD_Char(device_id);
-    _delay_ms(1000);
+	sprintf(str, "MPU6050 ID %x", device_id);
+	LCD_print(0x80,str);
+	//LCD_Char(device_id);
+    _delay_ms(400);
     // 반환된 ID가 예상 값(0x68)과 일치하는지 확인
     if (device_id == MPU6050_I2C_ADDRESS) {
         return 0; // 성공

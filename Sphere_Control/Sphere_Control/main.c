@@ -7,9 +7,15 @@
 
 #include "main.h"
 
-int main(void)
+
+/*
+	pitch는 위로 올라가면 -
+	yaw는 왼쪽이 +	
+*/
+
+
+void Init_main(void)
 {
-	cli();
 	char msg[20];
 	LCD_Init();
 	MPU6050_Init();
@@ -22,23 +28,39 @@ int main(void)
 	else
 	{
 		sprintf(msg, "Fail %d",res);
-		LCD_print(0x80,msg);	
-		delay_ms(1000);
+		LCD_print(0x80, msg);
+		LCD_print(0x10,"Please Restart");
+		while(1);
 	}
-	
+	Servo_Init();
+	servo_status.pitch = 90;
+	servo_status.yaw= 90;
+	//set_Servo(&servo_status, 0,0);
+	set_YawServo(DEG2OCR(servo_status.yaw));
+	set_PitchServo(DEG2OCR(servo_status.pitch));
+}
+
+int main(void)
+{
+	cli();
+	Init_main();
 	sei();
-	
+
 	uint8_t str[32];
 	LCD_Clear();
+	
+	
 	while (1)
 	{
 		if(data_ready_flg)
 		{
 			data_ready_flg = 0;
 			cli();
-			sprintf(str,"r:%d p:%d",(uint16_t)roll_deg,(uint16_t)pitch_deg);
+			sprintf(str,"r:%d p:%d y:%d",(uint16_t)roll_deg,(uint16_t)pitch_deg,(uint16_t)yaw_deg);
 			LCD_print(0x80,str);
-			sprintf(str,"y:%d",(uint16_t)yaw_deg);
+			//set_Servo_Relative(&servo_status, pitch_deg*Q2deg,yaw_deg*Q2deg);
+			set_Servo_Absolute(&servo_status,(uint16_t)pitch_deg, (uint16_t)yaw_deg);
+			sprintf(str,"motor p:%d y:%d", servo_status.pitch, servo_status.yaw);
 			LCD_print(0x10,str);	
 			_delay_ms(100);
 			sei();

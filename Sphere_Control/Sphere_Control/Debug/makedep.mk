@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+GP2Y0A02.c
+
 main.c
 
 MPU6050.c

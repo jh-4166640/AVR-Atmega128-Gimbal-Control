@@ -122,6 +122,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GP2Y0A02.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GP2Y0A02.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="lcd.h">
       <SubType>compile</SubType>
     </Compile>

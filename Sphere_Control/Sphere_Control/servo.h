@@ -24,14 +24,20 @@
 /* Servo motor and gy25 conversion ratio */
 /* Servo motor : GY25 = 2:3 */
 // 60 : 90
-#define SERVO2GY25_RATIO	(2.0/3.0)
+#define SERVO2GY25_RATIO	(2.0f/3.0f)
 #define SERVO_MAX 150
 #define SERVO_MIN 30
+#define SERVO_RANGE		(SERVO_MAX-SERVO_MIN)
+
+#define YAW_MIN			-10.0f
+#define YAW_MAX			10.0f
+#define	DELTA_YAW		(YAW_MAX-YAW_MIN)
+#define ResolutionStep	45
 
 typedef struct
 {
-	uint16_t yaw_deg;
-	uint16_t pitch_deg;
+	uint16_t yaw;
+	uint16_t pitch;
 }servo_t;
 
 static inline void delay_ms(uint16_t ms);
@@ -40,7 +46,10 @@ void Timer1_16bit_FastPWM_Init(void);
 static inline uint16_t DEG2OCR(uint16_t deg);
 static inline void set_YawServo(uint16_t ocr);
 static inline void set_PitchServo(uint16_t ocr);
-static inline void set_Servo(servo_t *cur, int16_t pitch, int16_t yaw);
+static inline void set_Servo_Relative(servo_t *cur, int16_t p_add, int16_t y_add);
+static inline void set_Servo_Absolute(servo_t *cur, int16_t p_deg, int16_t y_deg);
+
+
 //void Servo_sample_code(void);
 
 // 0 deg  OCR1 = 922
@@ -95,113 +104,50 @@ static inline void set_PitchServo(uint16_t ocr)
 {
 	OCR1B = ocr;
 }
-static inline void set_Servo(servo_t *cur, int16_t p_add, int16_t y_add)
+static inline void set_Servo_Relative(servo_t *cur, int16_t p_add, int16_t y_add)
 {
 	// pitch_add, yaw_add
 	float f_padd, f_yadd;
 	f_padd = (float)p_add * SERVO2GY25_RATIO;
 	f_yadd = (float)y_add * SERVO2GY25_RATIO;
-	cur->pitch_deg = (cur->pitch_deg * 9 + (cur->pitch_deg + (int16_t)f_padd)) / 10;
-	cur->yaw_deg = (cur->yaw_deg * 9 + (cur->yaw_deg + (int16_t)f_yadd)) / 10;
+	cur->pitch = (cur->pitch * 9 + (cur->pitch + (int16_t)f_padd)) / 10;
+	cur->yaw = (cur->yaw * 9 + (cur->yaw + (int16_t)f_yadd)) / 10;
 	
 	//cur->pitch_deg += (int16_t)f_padd;
 	//cur->yaw_deg += (int16_t)f_yadd;
-	if(cur->pitch_deg <= SERVO_MIN)			cur->pitch_deg = SERVO_MIN;
-	else if(cur->pitch_deg >= SERVO_MAX)	cur->pitch_deg = SERVO_MAX;
-	if(cur->yaw_deg <= SERVO_MIN)			cur->yaw_deg = SERVO_MIN;
-	else if(cur->yaw_deg >= SERVO_MAX)		cur->yaw_deg = SERVO_MAX;
+	if(cur->pitch <= SERVO_MIN)			cur->pitch = SERVO_MIN;
+	else if(cur->pitch >= SERVO_MAX)	cur->pitch = SERVO_MAX;
+	if(cur->yaw <= SERVO_MIN)			cur->yaw = SERVO_MIN;
+	else if(cur->yaw >= SERVO_MAX)		cur->yaw = SERVO_MAX;
 	
-	set_PitchServo(DEG2OCR(cur->pitch_deg));
-	set_YawServo(DEG2OCR(cur->yaw_deg));
+	set_PitchServo(DEG2OCR(cur->pitch));	
+	set_YawServo(DEG2OCR(cur->yaw));
 }
 
-void Servo_sample_code(void)
+static inline void set_Servo_Absolute(servo_t *cur, int16_t p_deg, int16_t y_deg)
 {
-	//OCR1A = DEG2OCR(180);
-	OCR1A = DEG2OCR(90);
-	OCR1B = DEG2OCR(90);
-	uint16_t cur_deg = 90;
-	uint16_t cur_deg2 = 90;
-	char lcd_deg_buffer[4];
-	char lcd_deg_buffer2[4];
-	uint8_t SET_DISP[] = "degree1 :";
-	uint8_t SET_DISP2[] = "degree2 :";
-	itoa(cur_deg, lcd_deg_buffer, 10);
-	itoa(cur_deg2, lcd_deg_buffer2, 10);
+	/*
+	#define YAW_MIN			-10
+	#define YAW_MAX			10
+	#define	DELTA_YAW		YAW_MAX-YAW_MIN
+	#define ResolutionStep	45
+	*/
+	float yaw_index_f;
+	int16_t yaw_index;
+	float yaw_mappeed_angle;
 	
-	while(1)
-	{
-		uint8_t sw = (PIND & 0xff);
-		uint8_t state = 0xff;
-		if(sw == 0xfe || sw == 0xfd || sw == 0xfb || sw == 0xf7 || sw == 0xef || sw == 0xdf || sw == 0xbf || sw == 0x7f)
-		{
-			state = sw;
-			delay_ms(100);
-		}
-		switch(state)
-		{
-			case 0xfe:
-				delay_ms(100);
-				OCR1A = DEG2OCR(0);
-				OCR1B = DEG2OCR(180);
-				cur_deg = 0;
-				cur_deg2 = 180;
-				itoa(cur_deg, lcd_deg_buffer, 10);
-				itoa(cur_deg2, lcd_deg_buffer2, 10);
-				break;
-			case 0xfd:
-				delay_ms(100);
-				cur_deg+=10;
-				OCR1A = DEG2OCR(cur_deg);
-				itoa(cur_deg, lcd_deg_buffer, 10);
-				break;
-			case 0xfb:
-				delay_ms(100);
-				cur_deg-=10;
-				OCR1A = DEG2OCR(cur_deg);
-				itoa(cur_deg, lcd_deg_buffer, 10);
-				break;
-			case 0xf7:
-				delay_ms(100);
-				OCR1A = DEG2OCR(90);
-				cur_deg = 90;
-				itoa(cur_deg, lcd_deg_buffer, 10);
-				break;
-			case 0xef:
-				delay_ms(100);
-				OCR1A = DEG2OCR(120);
-				cur_deg = 120;
-				itoa(cur_deg, lcd_deg_buffer, 10);
-				break;
-			case 0xdf:
-				
-				break;
-			case 0xbf:
-				delay_ms(100);
-				cur_deg2+=10;
-				OCR1B = DEG2OCR(cur_deg2);
-				itoa(cur_deg2, lcd_deg_buffer2, 10);
-				break;
-			case 0x7f:
-				delay_ms(100);
-				cur_deg2-=10;
-				OCR1B = DEG2OCR(cur_deg2);
-				itoa(cur_deg2, lcd_deg_buffer2, 10);
-				break;
-			default:
-			
-			break;
-		}
-		LCD_print(0x80,SET_DISP);
-		LCD_print(0x0A,(uint8_t)lcd_deg_buffer);
-		
-		LCD_print(0x10,SET_DISP2);
-		LCD_print(0x1A,(uint8_t)lcd_deg_buffer2);
-		
-		delay_ms(100);	
-	}
+	uint8_t msg[16];
+	
+	if(y_deg > YAW_MAX) y_deg =YAW_MAX;
+	else if(y_deg < YAW_MIN) y_deg = YAW_MIN;	
+	yaw_index_f = (((float)y_deg - YAW_MIN) / DELTA_YAW) * (float)(ResolutionStep-1.0f);	
+	yaw_index = (int16_t)roundf(yaw_index_f);
+	yaw_mappeed_angle = SERVO_MIN + (float)yaw_index * (SERVO_RANGE/(float)(ResolutionStep - 1));
+
+	cur->yaw = (uint16_t)yaw_mappeed_angle;
+	set_YawServo(DEG2OCR(cur->yaw));
+	
+	
 }
-
-
 #endif /* SERVO_H_ */
 
