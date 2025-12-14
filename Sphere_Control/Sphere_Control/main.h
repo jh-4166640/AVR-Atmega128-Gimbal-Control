@@ -18,6 +18,7 @@
 #include "lcd.h"
 #include "servo.h"
 #include "MPU6050.h"
+#include "GP2Y0A02.h"
 
 #define Q2deg	5
 

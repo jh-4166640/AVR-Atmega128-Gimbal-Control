@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+void ADC_Init(void);
+uint16_t GP2Y0A_read_ADC();
+float GP2Y0A_Distance();
 
 
 

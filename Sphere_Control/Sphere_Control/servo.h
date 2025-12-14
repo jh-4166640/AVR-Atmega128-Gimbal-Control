@@ -30,6 +30,10 @@
 #define SERVO_RANGE_YAW		(SERVO_MAX_YAW-SERVO_MIN_YAW)
 #define SERVO_MAX_PITCH		170
 #define SERVO_MIN_PITCH		90
+#define Trans_deg_yaw		30.0f
+#define Trans_deg_pitch		80.0f
+#define YAWRATIO			(((float)SERVO_MAX_YAW - 90.0f)/Trans_deg_yaw)
+#define PITCHRATIO			(((float)SERVO_MAX_PITCH - 90.0f)/Trans_deg_pitch)
 
 
 #define YAW_MIN			-10.0f
@@ -145,7 +149,7 @@ static inline void set_Servo_angle(servo_t *cur, float pdeg, float stabz_p, floa
 		cur->yaw = cur_y;
 		delay_ms(1);
 	}
-	delay_ms(2);
+	delay_ms(20);
 }
 static inline int16_t set_ServoPitch_Relative(const uint16_t cur, float p_deg, float stabilize_val)
 {
@@ -153,7 +157,7 @@ static inline int16_t set_ServoPitch_Relative(const uint16_t cur, float p_deg, f
 	float delta = p_deg - stabilize_val;
 	if(fabs(delta) < pass_val) return cur;
 	
-	int16_t target_angle = cur + ((int16_t)roundf(delta * 8.0f));
+	int16_t target_angle = cur + ((int16_t)roundf(delta * PITCHRATIO));
 	if(target_angle <= SERVO_MIN_PITCH) target_angle = SERVO_MIN_PITCH;
 	else if(target_angle >= SERVO_MAX_PITCH) target_angle = SERVO_MAX_PITCH;
 	
@@ -166,7 +170,7 @@ static inline int16_t set_ServoYaw_Relative(const uint16_t cur, float y_deg, flo
 	float delta = y_deg - stabilize_val;
 	if(fabs(delta) < pass_val) return cur;
 	
-	int16_t target_angle = cur + ((int16_t)roundf(delta * 6.0f));
+	int16_t target_angle = cur + ((int16_t)roundf(delta * YAWRATIO));
 	if(target_angle > SERVO_MAX_YAW) target_angle = SERVO_MAX_YAW;
 	else if(target_angle < SERVO_MIN_YAW) target_angle = SERVO_MIN_YAW;
 	
