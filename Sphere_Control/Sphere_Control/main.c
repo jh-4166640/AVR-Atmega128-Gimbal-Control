@@ -15,14 +15,15 @@
 #define StabilizeCNT		5
 #define StabilizeCNT_p		2
 #define AlamLED_PORT		PORTC
-#define AlamLED_PITCH_MAX	0
-#define AlamLED_YAW_MAX		2
-#define AlamLED_Detection	4
+#define RotateLedA			0
+#define RotateLedB			2
+#define RotateLedC			4
+#define AlamLED_Detection	6
 
 void Init_main(void)
 {
 	char msg[20];
-	DDRC = (1<<AlamLED_Detection) | (1<<AlamLED_PITCH_MAX) | (1<<AlamLED_YAW_MAX);
+	DDRC = (1<<AlamLED_Detection) | (1<<RotateLedA) | (1<<RotateLedB) | (1<<RotateLedC);
 	AlamLED_PORT = 0x00;
 	LCD_Init();
 	MPU6050_Init();
@@ -46,20 +47,55 @@ void Init_main(void)
 	//set_Servo(&servo_status, 0,0);
 	set_YawServo(DEG2OCR(servo_status.yaw));
 	set_PitchServo(DEG2OCR(servo_status.pitch));
-	AlamLED_PORT = (1<<AlamLED_Detection) | (1<<AlamLED_PITCH_MAX) | (1<<AlamLED_YAW_MAX);
+	AlamLED_PORT = (1<<AlamLED_Detection) | (1<<RotateLedA) | (1<<RotateLedB) | (1<<RotateLedC);
 }
-static inline void AlamLED(uint32_t dist)
+static inline uint8_t Output_ABC(uint8_t num)
+{
+	uint8_t out = 0x00;
+	if(num == 1) out|=(1<<RotateLedA);
+	else if(num == 2) out = (1<<RotateLedB);
+	else if(num == 3) out = (1<<RotateLedB) | (1<<RotateLedA);
+	else if(num == 4) out = (1<<RotateLedC);
+	else if(num == 5) out = (1<<RotateLedC) | (1<<RotateLedA);
+	else if(num == 6) out = (1<<RotateLedC) | (1<<RotateLedB);
+	return out;
+}
+static inline void RotateLED_Calc(uint16_t servo_yaw_deg)
+{
+	//#define SERVO_MAX_YAW		150
+	//#define SERVO_MIN_YAW		30
+	if(servo_yaw_deg >= SERVO_MAX_YAW-20) //150~130
+	{
+		AlamLED_PORT&=(1<<AlamLED_Detection);
+		AlamLED_PORT|=Output_ABC(1);
+	}
+	else if(servo_yaw_deg < SERVO_MAX_YAW-20 &&  servo_yaw_deg >= SERVO_MAX_YAW-40) //129~110
+	{
+		AlamLED_PORT&=(1<<AlamLED_Detection);
+		AlamLED_PORT|=Output_ABC(2);	
+	}
+	else if(servo_yaw_deg < SERVO_MAX_YAW-40 &&  servo_yaw_deg >= SERVO_MAX_YAW-80) //109~70
+	{
+		AlamLED_PORT&=(1<<AlamLED_Detection);
+		AlamLED_PORT|=Output_ABC(3);
+	}
+	else if(servo_yaw_deg < SERVO_MAX_YAW-80 &&  servo_yaw_deg >= SERVO_MAX_YAW-100) //69~50
+	{
+		AlamLED_PORT&=(1<<AlamLED_Detection);
+		AlamLED_PORT|=Output_ABC(4);
+	}
+	else if(servo_yaw_deg < SERVO_MAX_YAW-100 &&  servo_yaw_deg >= SERVO_MIN_YAW) //49~30
+	{
+		AlamLED_PORT&=(1<<AlamLED_Detection);
+		AlamLED_PORT|=Output_ABC(5);
+	}
+	
+}
+static inline void AlamLED(uint32_t dist, uint16_t servo_yaw_deg)
 {
 	if(dist < 50)							AlamLED_PORT &= ~(1<<AlamLED_Detection);
-	else										AlamLED_PORT |= (1<<AlamLED_Detection);
-	
-	if(servo_status.pitch <= SERVO_MIN_PITCH
-	|| servo_status.pitch >= SERVO_MAX_PITCH)	AlamLED_PORT &= ~(1<<AlamLED_PITCH_MAX);
-	else										AlamLED_PORT |= (1<<AlamLED_PITCH_MAX);
-	
-	if(servo_status.yaw <= SERVO_MIN_YAW
-	|| servo_status.yaw >= SERVO_MAX_YAW)		AlamLED_PORT &= ~(1<<AlamLED_YAW_MAX);
-	else										AlamLED_PORT |= (1<<AlamLED_YAW_MAX);
+	else									AlamLED_PORT |= (1<<AlamLED_Detection);
+	RotateLED_Calc(servo_yaw_deg);
 }
 
 int main(void)
@@ -102,7 +138,7 @@ int main(void)
 			float dist = GP2Y0A_Distance();
 			uint32_t dist_int = (uint32_t)(dist);
 			sprintf(str,"distance %d",dist_int);
-			AlamLED(dist_int);
+			AlamLED(dist_int,servo_status.yaw);
 			LCD_print(0x10,str);
 			sei();
 			scan_MPUcnt++;
